@@ -1,0 +1,18 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+faust = "*"
+factom-api = "==0.1.1"
+kafka-python = "*"
+tweepy = "*"
+pymongo = "*"
+flask = "*"
+flask-restful = "*"
+
+[requires]
+python_version = "3.6"

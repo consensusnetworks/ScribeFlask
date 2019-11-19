@@ -1,45 +1,40 @@
-from factom import Factomd, FactomWalletd, exceptions #python Factom API
+from factom import Factomd, FactomWalletd
+from factom.exceptions import FactomAPIError 
 import json
 
 from credentials import FCT_ADDRESS, EC_ADDRESS, TWITTER_KEY, TWITTER_SECRET, TWITTER_APP_KEY, TWITTER_APP_SECRET
-# print(FCT_ADDRESS,EC_ADDRESS)
 
 def createChain(twitterid):
-    tweet_id = str(twitterid)
-    print(tweet_id)
-    fct_address = FCT_ADDRESS
-    ec_address = EC_ADDRESS
-    print(ec_address)
-
+    tweet_id = twitterid
     factomd = Factomd(
     host='http://18.222.184.135:8088',
-    fct_address=fct_address,
-    ec_address=ec_address,
+    fct_address=FCT_ADDRESS,
+    ec_address=EC_ADDRESS,
     username='rpc_username',
     password='rpc_password'
     )
 
     walletd = FactomWalletd(
     host='http://18.222.184.135:8089',
-    fct_address=fct_address,
-    ec_address=ec_address,
+    fct_address=FCT_ADDRESS,
+    ec_address=EC_ADDRESS,
     username='rpc_username',
     password='rpc_password'
     )
 
     try:
-        walletd.new_chain(factomd, 
-                                [ "random",'chain', "idqqqqq"],
-                                "This is a test", ec_address=ec_address) 
-                        
-        # chain_ID = resp['chainid']
-        # print(chain_ID)
-        # time.sleep(1)
+        resp = walletd.new_chain(factomd,
+                            [ 'TwitterBank Record',str(tweet_id), 'refactor378'],
+                            'This is the start of this users TwitterBank Records', 
+                            ec_address=EC_ADDRESS) 
+        print(resp)             
+        chain_ID = resp['chainid']
+        print(chain_ID)
+        time.sleep(1)
         # print(factomd.entry_credit_balance(ec_address))
 
-    except exceptions.FactomAPIError as e:
-        data = e.data
-        print(data )
+    except FactomAPIError as e:
+        print(e.data)
         print('ERROR')
         return True
 

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ffa6c63c538defa5d594cf66b05237080b1855d19c40740743e12cf2536f8af4"
+            "sha256": "28aeeeeff51f875d5310eea3f54ea951815be7bc6d09b4febe75013e9e8f54d4"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -119,11 +119,10 @@
         },
         "factom-api": {
             "hashes": [
-                "sha256:740baa52fffc30063cc9fd61cb79939ee564b8dc7f0ccfae7b4aee2b7af1c6e8",
-                "sha256:ae26e343a786b4edae6fab9ac09f6535f474e7c647602a216f67ff9b48cabdba"
+                "sha256:9dcb97235a08fda8ae4966f7bcf77fffcbd8a1d37118467325741d9a4f8460a4"
             ],
             "index": "pypi",
-            "version": "==0.1.1"
+            "version": "==1.0.3"
         },
         "faust": {
             "hashes": [

@@ -7,7 +7,7 @@ verify_ssl = true
 
 [packages]
 faust = "*"
-factom-api = "==0.1.1"
+factom-api = "*"
 kafka-python = "*"
 tweepy = "*"
 pymongo = "*"

@@ -1,14 +1,15 @@
+import bcrypt
+import json
+import os
+from pymongo import MongoClient
+import time
+
 from factom import Factomd, FactomWalletd
 from factom.exceptions import FactomAPIError 
 from flask import Flask, jsonify, request
 from flask_restful import Api, Resource
-import json
-import os
-import time
-
 from kafka import SimpleProducer, KafkaClient, KafkaConsumer
 
-from credentials import FCT_ADDRESS, EC_ADDRESS, TWITTER_KEY, TWITTER_SECRET, TWITTER_APP_KEY, TWITTER_APP_SECRET
 from config import config
 from utils import createChain
 
@@ -22,21 +23,44 @@ print(factom_url, wallet_url, ec_address, fct_address)
 app = Flask(__name__)
 api = Api(app)
 
-# factomd = Factomd(
-#     host='http://18.222.184.135:8088',
-#     fct_address=FCT_ADDRESS,
-#     ec_address=EC_ADDRESS,
-#     username='rpc_username',
-#     password='rpc_password'
-#     )
+client = MongoClient("mongodb://db:27017")
+db = client.ScribeDatabase
+users = db["Users"]
 
-# walletd = FactomWalletd(
-#     host='http://18.222.184.135:8089',
-#     fct_address=FCT_ADDRESS,
-#     ec_address=EC_ADDRESS,
-#     username='rpc_username',
-#     password='rpc_password'
-#     )
+class UserRegistration(Resource):
+    def post(self):
+        #step 1 get posted data by the user
+        postedData = request.get_json()
+
+        #Get the data
+        username = postedData["username"]
+        password = postedData["password"]
+
+        correct_pw = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
+
+        #Store username and password in database
+        users.insert({
+            "Username": username,
+            "Password": correct_pw,
+            "Accounts":[]
+        })
+
+        retJson = {
+            "status": 200,
+            "msg": "You successfully signed up for the API",
+        }
+
+        return jsonify(retJson)
+        
+def verifyPw(username, password):
+    hashed_pw = users.find({
+        "Username": username
+    })[0]["Password"]
+
+    if bcrypt.hashpw(password.encode('utf8'), hashed_pw) == hashed_pw:
+        return True
+    else: 
+        return False
 
 class TwitterAccount(Resource):
     def post(self):
@@ -75,7 +99,7 @@ class TwitterAccount(Resource):
 
         return jsonify(retJSON)
 
-
+api.add_resource(UserRegistration, '/register')
 api.add_resource(TwitterAccount, '/twitteraccounts')
 @app.route('/')
 def hello_world():

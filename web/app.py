@@ -18,7 +18,6 @@ factom_url = conf.FACTOM_BASE_URL
 wallet_url = conf.WALLET_BASE_URL
 ec_address = conf.EC_ADDR
 fct_address = conf.FC_ADDR
-print(factom_url, wallet_url, ec_address, fct_address)
 
 app = Flask(__name__)
 api = Api(app)
@@ -69,9 +68,19 @@ class TwitterAccount(Resource):
 
         print(postedData)
         #Step 2 is to read the data
+        username = postedData["username"]
+        password = postedData["password"]
         handle = postedData["handle"]
         twitterid = str(postedData["twitter_id"])
-        print(handle, twitterid)
+        
+        #Step 3 verify the username pw match
+        correct_pw = verifyPw(username, password)
+
+        if not correct_pw:
+            retJson = {
+                "status":302
+            }
+            return jsonify(retJson)
 
         #Step3 Generate Chain for Twitter Account
         factomd = Factomd(host=factom_url, ec_address=ec_address, fct_address=fct_address, username='rpc_username',password='rpc_password')
@@ -91,7 +100,20 @@ class TwitterAccount(Resource):
             print('ERROR')
             chainid = str(e.data)
 
-
+        #Step 4 Store the Account in the database for a user
+        users.update({
+            "Username":username,
+        }, {
+            "$set": {
+                    "Accounts":[
+                        {
+                            "handle": handle,
+                            "twitterid": twitterid,
+                            "chainid": chainid
+                        }
+                    ]
+                }
+        })
         retJSON = {
             'Message': chainid + " successfully created!",
             'Status Code': 200

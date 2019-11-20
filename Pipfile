@@ -50,6 +50,7 @@ Jinja2 = "==2.10.3"
 MarkupSafe = "==1.1.1"
 PySocks = "==1.7.1"
 Werkzeug = "==0.16.0"
+bcrypt = "*"
 
 [requires]
 python_version = "3.6"

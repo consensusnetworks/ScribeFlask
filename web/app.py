@@ -1,6 +1,7 @@
 import bcrypt
 import json
 import os
+import pickle
 from pymongo import MongoClient
 import time
 
@@ -8,7 +9,7 @@ from factom import Factomd, FactomWalletd
 from factom.exceptions import FactomAPIError 
 from flask import Flask, jsonify, request
 from flask_restful import Api, Resource
-from kafka import SimpleProducer, KafkaClient, KafkaConsumer
+from kafka import KafkaProducer, KafkaClient, KafkaConsumer
 
 from config import config
 from utils import createChain
@@ -73,6 +74,7 @@ class TwitterAccount(Resource):
         handle = postedData["handle"]
         twitterid = str(postedData["twitter_id"])
         
+        
         #Step 3 verify the username pw match
         correct_pw = verifyPw(username, password)
 
@@ -109,19 +111,75 @@ class TwitterAccount(Resource):
                         {
                             "handle": handle,
                             "twitterid": twitterid,
-                            "chainid": chainid
+                            "chainid": chainid,
+                            "tracking": ""
                         }
                     ]
                 }
         })
         retJSON = {
-            'Message': chainid + " successfully created!",
+            'Message': str(chainid) + " successfully created!",
+            'Status Code': 200
+        }
+
+        return jsonify(retJSON)
+
+class Track(Resource):
+    def post(self):
+        #Step 1 get the posted data
+        postedData = request.get_json()
+
+        #Step 2 is to read the data
+        username = postedData["username"]
+        password = postedData["password"]
+        handle = postedData["handle"]
+        twitterid = str(postedData["twitter_id"])
+        chainid = postedData["chainid"]
+
+        #Step 3 verify the username pw match
+        correct_pw = verifyPw(username, password)
+
+        if not correct_pw:
+            retJson = {
+                "status":302
+            }
+            return jsonify(retJson)
+        
+        #Step 4 get the twitterid for the account you want to track
+        twitteraccount = users.find_one({"Accounts.twitterid": twitterid})
+        account = twitteraccount['Accounts']
+        taccount = pickle.dumps(account[0])
+
+        #Step 4 Send Account object to Kafka
+        # kafka = KafkaClient("kafka:9092")
+        producer = KafkaProducer(bootstrap_servers= "kafka:9092", value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+        producer.send('Scribe', account)
+        print('Sending Condition to Mempool!')
+
+        #Step 4 Store the Account in the database for a user
+        users.update({
+            "Username":username,
+        }, {
+            "$set": {
+                    "Accounts":[
+                        {
+                            "handle": handle,
+                            "twitterid": twitterid,
+                            "chainid": chainid,
+                            "tracking": "yes"
+                        }
+                    ]
+                }
+        })
+        retJSON = {
+            'Message': handle + " successfully tracked!",
             'Status Code': 200
         }
 
         return jsonify(retJSON)
 
 api.add_resource(UserRegistration, '/register')
+api.add_resource(Track, '/track')
 api.add_resource(TwitterAccount, '/twitteraccounts')
 @app.route('/')
 def hello_world():

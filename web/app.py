@@ -1,7 +1,7 @@
 import bcrypt
 import json
+import logging
 import os
-import pickle
 from pymongo import MongoClient
 import time
 
@@ -9,7 +9,8 @@ from factom import Factomd, FactomWalletd
 from factom.exceptions import FactomAPIError 
 from flask import Flask, jsonify, request
 from flask_restful import Api, Resource
-from kafka import KafkaProducer, KafkaClient, KafkaConsumer
+from kafka import SimpleProducer, KafkaClient, KafkaConsumer
+from kafka.errors import KafkaError
 
 from config import config
 from utils import createChain
@@ -19,6 +20,7 @@ factom_url = conf.FACTOM_BASE_URL
 wallet_url = conf.WALLET_BASE_URL
 ec_address = conf.EC_ADDR
 fct_address = conf.FC_ADDR
+kafka_url = conf.KAFKA_URL
 
 app = Flask(__name__)
 api = Api(app)
@@ -38,7 +40,7 @@ class UserRegistration(Resource):
 
         correct_pw = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
 
-        #Store username and password in database
+        # Store username and password in database
         users.insert({
             "Username": username,
             "Password": correct_pw,
@@ -75,7 +77,7 @@ class TwitterAccount(Resource):
         twitterid = str(postedData["twitter_id"])
         
         
-        #Step 3 verify the username pw match
+        # Step 3 verify the username pw match
         correct_pw = verifyPw(username, password)
 
         if not correct_pw:
@@ -84,7 +86,7 @@ class TwitterAccount(Resource):
             }
             return jsonify(retJson)
 
-        #Step3 Generate Chain for Twitter Account
+        # Step3 Generate Chain for Twitter Account
         factomd = Factomd(host=factom_url, ec_address=ec_address, fct_address=fct_address, username='rpc_username',password='rpc_password')
         walletd = FactomWalletd(host=wallet_url, ec_address=ec_address, fct_address=fct_address, username='rpc_username',password='rpc_password')
         print(factomd, walletd)
@@ -102,7 +104,7 @@ class TwitterAccount(Resource):
             print('ERROR')
             chainid = str(e.data)
 
-        #Step 4 Store the Account in the database for a user
+        # Step 4 Store the Account in the database for a user
         users.update({
             "Username":username,
         }, {
@@ -145,15 +147,21 @@ class Track(Resource):
             }
             return jsonify(retJson)
         
-        #Step 4 get the twitterid for the account you want to track
+        # Step 4 get the twitterid for the account you want to track
         twitteraccount = users.find_one({"Accounts.twitterid": twitterid})
         account = twitteraccount['Accounts']
-        taccount = pickle.dumps(account[0])
+        taccount = account[0]
 
         #Step 4 Send Account object to Kafka
-        # kafka = KafkaClient("kafka:9092")
-        producer = KafkaProducer(bootstrap_servers= "kafka:9092", value_serializer=lambda v: json.dumps(v).encode('utf-8'))
-        producer.send('Scribe', account)
+        kafka = KafkaClient(kafka_url)
+        producer = SimpleProducer(kafka, value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+        try:
+            logging.info('sending message %s to kafka', chainid)
+            producer.send_messages('Scribe', json.dumps(taccount).encode('utf-8'))
+            logging.info('%s sent!', taccount)
+        except KafkaError as error:
+            logging.warning('The message was not sent to the mempool, caused by %s', error)
+
         print('Sending Condition to Mempool!')
 
         #Step 4 Store the Account in the database for a user
@@ -172,7 +180,7 @@ class Track(Resource):
                 }
         })
         retJSON = {
-            'Message': handle + " successfully tracked!",
+            'Message': str(taccount) + " successfully tracked!",
             'Status Code': 200
         }
 

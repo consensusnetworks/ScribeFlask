@@ -1,25 +1,13 @@
-version: '3'
+version: '2'
 services:
-  web:
-    build: .
-    ports:
-      - "5000:5000"
-    links:
-      - db
-    networks:
-      - scribe-net
-  db:
-    build: ./db
-    networks:
-      - scribe-net
   zookeeper:
-    build: ./zookeeper
+    image: wurstmeister/zookeeper
     ports:
       - "2181:2181"
     networks:
       - scribe-net
   kafka:
-    build: ./kafka
+    image: wurstmeister/kafka
     ports:
       - "9092:9092"
     environment:
@@ -31,14 +19,5 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - scribe-net
-  # faust:
-  #   # command: >
-  #   #   sh -c "cp ~/Pipfile ~/faust/Pipfile"
-  #   build: ./faust
-  #   ports:
-  #     - "6066:6066"
-  #   networks:
-  #     - scribe-net
-    
 networks:
   scribe-net:

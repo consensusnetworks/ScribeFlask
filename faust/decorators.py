@@ -3,7 +3,7 @@ import time
 import urllib.request
 import urllib.error
 
-def sleep(timeout, retry=4):
+def sleep(timeout, retry=5):
     def the_real_decorator(function):
         def wrapper(*args, **kwargs):
             retries = 0
@@ -12,7 +12,7 @@ def sleep(timeout, retry=4):
             while retries < retry:
                 try:
                     value = function(*args, **kwargs)
-                    if value is '':
+                    if value is None:
                         return
                 except:
                     timer = ( timeout ** exponential)

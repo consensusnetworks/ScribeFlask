@@ -40,20 +40,41 @@ async def process_tweets(twitter_accounts):
         print(twitter_account)
         print(twitter_account.chainid)
         chainid = str(twitter_account.chainid)
-        print(chainid)
-        chain_id = check_chain(factomd, chainid)
-        print(chain_id)
-           
+        print('Checking Chain....')
+        chain = check_chain(factomd, chainid)
+        print(chain + ' has arrived!')
 
-@sleep(5)       
-def check_chain(factomd, chain_id):
+           
+       
+def check_chain(factomd, chainid):
     print('Checking Chain')
+    retry = 5
+    retries = 0
+    exponential = 1
+    timeout = 5
     try:
-        print('Checkign Chain')
-        chainhead =  factomd.chain_head(chain_id)
-        print(chainhead)
-        chain_id = chainhead['chainhead']
-        logging.info('Retrieved chain: {} with corresponding id {} (double string)'.format(chain, chain_id))
+        while retries < retry:
+            try:
+                chainhead =  factomd.chain_head(chainid)
+                chain_id = chainhead['chainhead']
+                print(chainhead)
+                if chain_id == '':
+                    print('Is None')
+                    timer = ( timeout ** exponential)
+                    print(f'Chain Not Ready, sleeping for {timer} seconds')
+                    time.sleep(timer)
+                    retries += 1
+                    exponential +=1
+                else:
+                    break
+            except:
+                timer = ( timeout ** exponential)
+                print(f'Chain Not Ready, sleeping for {timer} seconds')
+                time.sleep(timer)
+                retries += 1
+                exponential +=1
+        
+        logging.info('Retrieved chain: {} with corresponding id {} (double string)'.format(chainhead, chainid))
         print(chain_id)
         return chain_id
     except KeyError as e:

@@ -6,14 +6,16 @@ from datetime import datetime
 from hashlib import sha256
 
 import time
-# import tweepy
+import tweepy
 import faust
 
 from factom import Factomd, FactomWalletd
+
+from factom.exceptions import FactomAPIError
 from config import config
+from decorators import sleep
 
-
-conf = config[os.environ.get('CHAINSVC_CONFIG', 'development')]
+conf = config[os.environ.get('SCRIBE_CONFIG', 'development')]
 factom_url = conf.FACTOM_BASE_URL
 wallet_url = conf.WALLET_BASE_URL
 ec_address = conf.EC_ADDR
@@ -27,25 +29,36 @@ class TwitterAccount(faust.Record, serializer='json'):
     chainid: str
     tracking: str
 
-
-chains = app.topic('Chains', value_serializer='json')
-handles = app.topic('Handles', value_serializer='json')
-tweetids = app.topic('TweetIDs', value_serializer='json')
 # source_topic = app.topic('Scribe', value_serializer='json')
+source_topic = app.topic('Scribe', value_type=TwitterAccount)
+@app.agent(source_topic)
+async def process_tweets(twitter_accounts):
+    factomd = Factomd(host=factom_url, ec_address=ec_address, fct_address=fct_address, username='rpc_username',password='rpc_password')
+    walletd = FactomWalletd(host=wallet_url, ec_address=ec_address, fct_address=fct_address, username='rpc_username',password='rpc_password')
+    async for twitter_account in twitter_accounts:
+        print('TESTING NOW!')
+        print(twitter_account)
+        print(twitter_account.chainid)
+        chainid = str(twitter_account.chainid)
+        print(chainid)
+        chain_id = check_chain(factomd, chainid)
+        print(chain_id)
+           
 
-chainStream = app.stream(chains)
-handleStream = app.stream(handles)
-IDStream = app.stream(tweetids)
-
-@app.task()
-async for value in (chainStream & handleStream & IDStream):
-    print(value)
-# @app.agent(source_topic)
-# async def process(stream):
-#     async for payload in stream:
-#         print('TESTING NOW!')
-#         twitteraccount = json.loads(payload)
-#         print(twitteraccount)
+@sleep(5)       
+def check_chain(factomd, chain_id):
+    print('Checking Chain')
+    try:
+        print('Checkign Chain')
+        chainhead =  factomd.chain_head(chain_id)
+        print(chainhead)
+        chain_id = chainhead['chainhead']
+        logging.info('Retrieved chain: {} with corresponding id {} (double string)'.format(chain, chain_id))
+        print(chain_id)
+        return chain_id
+    except KeyError as e:
+        logging.debug('No chain found')
+        return None
 
 async def start_worker(worker: faust.Worker) -> None:
     """

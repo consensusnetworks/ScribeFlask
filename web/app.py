@@ -9,7 +9,7 @@ from factom import Factomd, FactomWalletd
 from factom.exceptions import FactomAPIError 
 from flask import Flask, jsonify, request
 from flask_restful import Api, Resource
-from kafka import SimpleProducer, KafkaClient, KafkaConsumer
+from kafka import SimpleProducer, KafkaClient, KafkaConsumer, KafkaProducer
 from kafka.errors import KafkaError
 
 from config import config
@@ -153,11 +153,13 @@ class Track(Resource):
         taccount = account[0]
 
         #Step 4 Send Account object to Kafka
-        kafka = KafkaClient(kafka_url)
+        kafka = KafkaClient("kafka:9093")
+        # client=KafkaClient('localhost:9092')
         producer = SimpleProducer(kafka, value_serializer=lambda v: json.dumps(v).encode('utf-8'))
         try:
             logging.info('sending message %s to kafka', chainid)
             producer.send_messages('Scribe', json.dumps(taccount).encode('utf-8'))
+            # producer.send('Scribe', taccount)
             logging.info('%s sent!', taccount)
         except KafkaError as error:
             logging.warning('The message was not sent to the mempool, caused by %s', error)

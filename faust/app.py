@@ -11,10 +11,10 @@ import faust
 
 from factom import Factomd, FactomWalletd
 from factom.exceptions import FactomAPIError
+from kafka import KafkaClient
 
 from asyncfxns import StreamListener, tweetFetcher
 from config import config
-from decorators import sleep
 from utils import filterTweets, getAllTweets, sendTweets, filterTweets, getAllTweets, fromCreator, getKeys, getTwitterCredentials, reconstructTweet
 
 
@@ -28,7 +28,7 @@ TWITTER_SECRET = conf.TWITTER_SECRET
 TWITTER_APP_KEY = conf.TWITTER_APP_KEY
 TWITTER_APP_SECRET = conf.TWITTER_APP_SECRET
 
-app = faust.App('Scribe', broker="kafka://localhost:9092")
+app = faust.App('Scribe', broker='kafka://localhost:9092', autodiscover=True,)
 
 class TwitterAccount(faust.Record, serializer='json'):
     handle: str
@@ -36,16 +36,14 @@ class TwitterAccount(faust.Record, serializer='json'):
     chainid: str
     tracking: str
 
-# source_topic = app.topic('Scribe', value_serializer='json')
 source_topic = app.topic('Scribe', value_type=TwitterAccount)
 @app.agent(source_topic)
 async def process_tweets(twitter_accounts):
     factomd = Factomd(host=factom_url, ec_address=ec_address, fct_address=fct_address, username='rpc_username',password='rpc_password')
     walletd = FactomWalletd(host=wallet_url, ec_address=ec_address, fct_address=fct_address, username='rpc_username',password='rpc_password')
     async for twitter_account in twitter_accounts:
-        print('TESTING NOW!')
+        print('Twitter Account Received!')
         print(twitter_account)
-        print(twitter_account.chainid)
         chainid = str(twitter_account.chainid)
         print('Checking Chain....')
         chain_id = check_chain(factomd, chainid)
@@ -70,9 +68,7 @@ def check_chain(factomd, chainid):
             try:
                 chainhead =  factomd.chain_head(chainid)
                 chain_id = str(chainhead['chainhead'])
-                print(chainhead)
                 if chain_id == '':
-                    print('Is None')
                     timer = ( timeout ** exponential)
                     print(f'Chain Not Ready, sleeping for {timer} seconds')
                     time.sleep(timer)
@@ -88,7 +84,6 @@ def check_chain(factomd, chainid):
                 exponential +=1
         
         logging.info('Retrieved chain: {} with corresponding id {} (double string)'.format(chainhead, chainid))
-        print(chain_id)
         return chain_id
     except KeyError as e:
         logging.debug('No chain found')
@@ -120,7 +115,7 @@ async def start_worker(worker: faust.Worker) -> None:
     await worker.start()
 
 if __name__ == '__main__':
-
+    app.main()
     loop = asyncio.get_event_loop()
     worker = faust.Worker(app, loop=loop, loglevel='info')
     try:

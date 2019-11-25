@@ -45,13 +45,10 @@ async def tweetFetcher(handle, chainid):
     getAllTweets(handle) #fetches up to 3120 most recent tweets from a users timeline & creates a csv file of them
     print('Tweets Fetched')
     cwd = os.getcwd()
-    print(cwd)
 
     for file in os.listdir(cwd):
-        print(file)
         if file.endswith('.csv'):
             new_file = filterTweets(file) #filters the csv file so that only tweets from the account being tracked are present i.e no retweets, replies to their tweets, etc.
-            print(new_file)
             data = pd.read_csv(file) #reads a csv file of tweets
             df = pd.DataFrame(data)
 
@@ -86,10 +83,6 @@ class StreamListener(tweepy.StreamListener):
         self.twitterid = twitterid
         self.chain_id = chain_id
         self.handle = handle
-        # self.ec_address = ec_address
-        # self.fct_address = fct_address
-
-        print(self.twitterid, self.chain_id, self.handle)
 
     def on_status(self, status):  #Tweets will need to be filtered, twitter default pulls ALL tweets with the username you're tracking
         
@@ -101,23 +94,19 @@ class StreamListener(tweepy.StreamListener):
 
                 userid = status.user.id
                 user_id = str(userid).replace("'", '"')
-                print(str(userid))
 
                 tweetid = str(status.id)
                 tweet_id = str(tweetid).replace("'", '"')
-                print(tweetid)
 
                 name = status.user.screen_name #pulls username of tweeter
                 print('@',name, 'tweeted', status.text) #prints tweet to terminal
                 date = datetime.now()
                 
                 chain_id = str(self.chain_id)
-                print(chain_id)
                 topic = self.handle
                 
                 fct_entry = {'Date_Recorded': str(datetime.now()),
                             'tweet': status._json}
-                print(fct_entry)
                 try:
                     resp = walletd.new_entry(factomd, chain_id, 
                                              [ 'TwitterBank Record',user_id, tweet_id ,public, signature],

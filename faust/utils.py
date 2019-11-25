@@ -190,7 +190,6 @@ def getAllTweets(handle):
     
 	#initialize a list to hold all the tweepy Tweets
 	alltweets = []	
-	print('Gathering Tweets')
 	#make initial request for most recent tweets (200 is the maximum allowed count)
 	new_tweets = api.user_timeline(screen_name = handle,count=200)
 	
@@ -200,7 +199,6 @@ def getAllTweets(handle):
 	
 	#keep grabbing tweets until there are no tweets left to grab
 	while len(new_tweets) > 0:
-		print("Tweets grabbed")
 		#all subsiquent requests use the max_id param to prevent duplicates
 		new_tweets = api.user_timeline(screen_name = handle,count=200,max_id=oldest)
 		

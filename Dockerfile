@@ -8,8 +8,8 @@ RUN pipenv sync
 
 # RUN pipenv shell
 
-COPY ./requirements.txt  ./requirements.txt 
-RUN pipenv install -r requirements.txt 
+# COPY ./requirements.txt  ./requirements.txt 
+# RUN pipenv install -r requirements.txt 
 
 COPY . .
 

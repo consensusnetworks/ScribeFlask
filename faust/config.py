@@ -18,6 +18,13 @@ class Config(object):
     WALLET_BASE_URL = os.environ.get('WALLET_BASE_URL', 'http://18.222.184.135:8089')
     FACTOM_BASE_URL = os.environ.get('FACTOM_BASE_URL', 'http://18.222.184.135:8088')
 
+    TWITTER_KEY = os.environ.get('TWITTER_KEY', '8OkElZxTSOxPTHRzMxlkY0F5E')
+    TWITTER_SECRET = os.environ.get('TWITTER_SECRET', 'CVFmGkBkwchWhjRdDY6x3gOWxouhP6z4ohpgNlqgSdx1QUzYJz')
+    TWITTER_APP_KEY = os.environ.get('TWITTER_APP_KEY', '1088516191436656640-if27Ij2ssb3PWI5g5USIKi1BOtN08I')
+    TWITTER_APP_SECRET = os.environ.get('TWITTER_APP_SECRET', 'u4VmQZ256FTT5IrwEpErUeLr2Ta8W9CJJdgEpa5uznj2H')
+
+
+
 
 
 class ProductionConfig(Config):

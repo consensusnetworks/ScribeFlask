@@ -10,16 +10,23 @@ import tweepy
 import faust
 
 from factom import Factomd, FactomWalletd
-
 from factom.exceptions import FactomAPIError
+
+from asyncfxns import StreamListener, tweetFetcher
 from config import config
 from decorators import sleep
+from utils import filterTweets, getAllTweets, sendTweets, filterTweets, getAllTweets, fromCreator, getKeys, getTwitterCredentials, reconstructTweet
+
 
 conf = config[os.environ.get('SCRIBE_CONFIG', 'development')]
 factom_url = conf.FACTOM_BASE_URL
 wallet_url = conf.WALLET_BASE_URL
 ec_address = conf.EC_ADDR
 fct_address = conf.FC_ADDR
+TWITTER_KEY = conf.TWITTER_KEY
+TWITTER_SECRET = conf.TWITTER_SECRET
+TWITTER_APP_KEY = conf.TWITTER_APP_KEY
+TWITTER_APP_SECRET = conf.TWITTER_APP_SECRET
 
 app = faust.App('Scribe', broker="kafka://localhost:9092")
 
@@ -41,8 +48,14 @@ async def process_tweets(twitter_accounts):
         print(twitter_account.chainid)
         chainid = str(twitter_account.chainid)
         print('Checking Chain....')
-        chain = check_chain(factomd, chainid)
-        print(chain + ' has arrived!')
+        chain_id = check_chain(factomd, chainid)
+        print('Chain has arrived at chainhead ' + chain_id)
+        handle = str(twitter_account.handle)
+        tweetid = str(twitter_account.twitterid)
+        print('Gathering Tweets for Factomization for ' + handle)
+        await getAccounts(handle, tweetid, chainid)
+        
+
 
            
        
@@ -56,7 +69,7 @@ def check_chain(factomd, chainid):
         while retries < retry:
             try:
                 chainhead =  factomd.chain_head(chainid)
-                chain_id = chainhead['chainhead']
+                chain_id = str(chainhead['chainhead'])
                 print(chainhead)
                 if chain_id == '':
                     print('Is None')
@@ -80,6 +93,23 @@ def check_chain(factomd, chainid):
     except KeyError as e:
         logging.debug('No chain found')
         return None
+
+async def getAccounts(handle, twitterid, chain_id):
+
+    Stream_Listener = StreamListener() #Turns Stream Listener Class On
+    Stream_Listener.field_load(handle, twitterid, chain_id)
+
+    try:
+        api = getTwitterCredentials(TWITTER_KEY, TWITTER_SECRET, TWITTER_APP_KEY, TWITTER_APP_SECRET) #authorize api credentials
+        stream = tweepy.Stream(auth = api.auth, listener=Stream_Listener, aync=True) #create a stream for the account
+        stream.filter(follow = [str(twitterid)], is_async=True) #listens to twitter account and triggers for only the account's tweets
+        
+    except Exception as ex: #error handling to restart streamer in the event of it stopping for things like Rate Limit Error
+        print ("[STREAM] Stream stopped! Reconnecting to twitter stream")
+        print (ex)
+        stream.filter(follow = [str(twitterid)])
+
+    await tweetFetcher(handle, chain_id)
 
 async def start_worker(worker: faust.Worker) -> None:
     """

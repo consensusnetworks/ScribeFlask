@@ -6,11 +6,6 @@ COPY ./Pipfile ./Pipfile
 RUN pipenv lock
 RUN pipenv sync
 
-# RUN pipenv shell
-
-COPY ./requirements.txt  ./requirements.txt 
-RUN pipenv install -r requirements.txt 
-
 COPY . .
 
 CMD ["pipenv","run", "python", "web/app.py"]

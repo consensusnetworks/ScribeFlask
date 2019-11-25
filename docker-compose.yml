@@ -31,21 +31,30 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
       KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
-      # KAFKA_CREATE_TOPICS: "Scribes-faust:1:1"
+      KAFKA_CREATE_TOPICS: "Scribe:1:1"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - scribe-net
-  # faust:
-  #   # command: >
-  #   #   sh -c "cp ~/Pipfile ~/faust/Pipfile"
-  #   build: ./faust
-  #   ports:
-  #     - "6066:6066"
-  #   networks:
-  #     - scribe-net
+  faust:
+    command: >
+      sh -c "sleep 60"
+    build: ./faust
+    ports:
+      - "6066:6066"
+
+    # environment:
+    #   - WORKER=faust
+    #   - WORKER_PORT=6066
+    #   - KAFKA_BOOTSTRAP_SERVER=kafka://localhost:9092
+    #   - KAFKA_BOOSTRAP_SERVER_NAME=kafka
+    #   - KAFKA_BOOSTRAP_SERVER_PORT=9092
+    links:
+      - kafka 
+    networks:
+      - scribe-net
     
 networks:
   scribe-net:

@@ -7,7 +7,7 @@ verify_ssl = true
 
 [packages]
 faust = "==1.9.0"
-factom-api = "==1.0.3"
+factom-api = "==0.1.1"
 kafka-python = "==1.4.7"
 tweepy = "==3.8.0"
 pymongo = "==3.9.0"
@@ -51,6 +51,8 @@ MarkupSafe = "==1.1.1"
 PySocks = "==1.7.1"
 Werkzeug = "==0.16.0"
 bcrypt = "*"
+python-identitykeys = "*"
+pandas = "*"
 
 [requires]
 python_version = "3.6"

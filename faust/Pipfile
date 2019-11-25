@@ -52,6 +52,7 @@ PySocks = "==1.7.1"
 Werkzeug = "==0.16.0"
 bcrypt = "*"
 python-identitykeys = "*"
+pandas = "*"
 
 [requires]
 python_version = "3.6"

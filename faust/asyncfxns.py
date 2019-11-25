@@ -51,9 +51,8 @@ async def tweetFetcher(handle, chainid):
         print(file)
         if file.endswith('.csv'):
             new_file = filterTweets(file) #filters the csv file so that only tweets from the account being tracked are present i.e no retweets, replies to their tweets, etc.
-            os.remove(file)
             print(new_file)
-            data = pd.read_csv(new_file) #reads a csv file of tweets
+            data = pd.read_csv(file) #reads a csv file of tweets
             df = pd.DataFrame(data)
 
             df_ids = df['id'] #defines a data frame object of only the row in the csv with tweetids
@@ -66,7 +65,7 @@ async def tweetFetcher(handle, chainid):
                 fct_entry = {'Date_Recorded': str(datetime.now()),
                             'tweet': status._json}
                 try:
-                    resp = walletd.new_entry(factomd, chain_id, 
+                    resp = walletd.new_entry(factomd, chainid, 
                                                 [ 'TwitterBank Record',user_id, tweet_id ,public, signature],
                                                 str(fct_entry), ec_address=ec_address) # makes entry into the factom testnet
                     

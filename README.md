@@ -22,6 +22,8 @@ docker-compose up
 
 To run the faust agent that will asynchronously gather an accounts most recent tweets, begin trackign them, and write them to the Factom blockchain, open a second terminal window and run the following after the kafka server has started:
 ```
+pipenv lock
+pipenv sync
 pipenv run python faust/app.py
 ```
 

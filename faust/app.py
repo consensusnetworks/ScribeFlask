@@ -28,7 +28,7 @@ TWITTER_SECRET = conf.TWITTER_SECRET
 TWITTER_APP_KEY = conf.TWITTER_APP_KEY
 TWITTER_APP_SECRET = conf.TWITTER_APP_SECRET
 
-app = faust.App('Scribe', broker='kafka://localhost:9092', autodiscover=True,)
+app = faust.App('Scribe', broker='kafka://localhost:9092',)
 
 class TwitterAccount(faust.Record, serializer='json'):
     handle: str
@@ -115,7 +115,6 @@ async def start_worker(worker: faust.Worker) -> None:
     await worker.start()
 
 if __name__ == '__main__':
-    app.main()
     loop = asyncio.get_event_loop()
     worker = faust.Worker(app, loop=loop, loglevel='info')
     try:

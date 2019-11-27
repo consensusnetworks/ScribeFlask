@@ -1,4 +1,4 @@
-version: '3'
+version: '3.7'
 services:
   web:
     build: .
@@ -38,15 +38,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - scribe-net
-  # faust:
-  #   command: >
-  #     sh -c "sleep 60"
-  #   build: ./faust
-  #   ports:
-  #     - "6066:6066"
-  #   # network_mode: host
-  #   links:
-  #     - kafka 
     
 networks:
   scribe-net:

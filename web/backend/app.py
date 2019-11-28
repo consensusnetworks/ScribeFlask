@@ -1,7 +1,7 @@
 import bcrypt
 import json
 import logging
-import datetime
+from datetime import datetime
 import os
 from pymongo import MongoClient
 import time
@@ -31,7 +31,8 @@ app.config['JWT_SECRET_KEY'] = 'secret'
 
 api = Api(app)
 jwt = JWTManager(app)
-client = MongoClient("mongodb://db:27017")
+# client = MongoClient("mongodb://db:27017")
+client = MongoClient("mongodb://localhost:27017")
 
 db = client.ScribeDatabase
 users = db["Users"]
@@ -46,11 +47,11 @@ class UserRegistration(Resource):
         #Get the data
         username = postedData["username"]
         password = postedData["password"]
-        correct_pw = bcrypt.generate_password_has(password.decode('utf-8'))
+        correct_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         email = postedData["email"]
         created = datetime.utcnow()
         # Store username and password in database
-        users.insert({
+        user_id = users.insert({
             "Username": username,
             "Password": correct_pw,
             "email": email,
@@ -72,19 +73,19 @@ class UserLogin(Resource):
         password = postedData["password"]
         result = ""
 
-        resoponse = users.find_one({"username": username})
+        response = users.find_one({"Username": username})
 
         if response:
-            if bcrypt.check_passwword_has(response["password"], password):
+            if bcrypt.checkpw( password.encode('utf8'), response["Password"]):
                 access_token = create_access_token(identity = {
-                    "username": response["username"],
+                    "username": response["Username"],
                     "email": response["email"]
                 })
                 result = jsonify({"token": access_token})
             else: 
-                result = jsonif({"error": "Invalid username and password"})
+                result = jsonify({"error": "Invalid username and password"})
         else:
-            result = jsonif({"result": "No results found"})
+            result = jsonify({"result": "No results found"})
 
         return result
 class TwitterAccount(Resource):
@@ -211,6 +212,7 @@ class Track(Resource):
 
         return jsonify(retJSON)
 
+api.add_resource(UserLogin, '/login')
 api.add_resource(UserRegistration, '/register')
 api.add_resource(Track, '/track')
 api.add_resource(TwitterAccount, '/twitteraccounts')

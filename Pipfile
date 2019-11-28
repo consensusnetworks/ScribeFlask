@@ -53,6 +53,9 @@ Werkzeug = "==0.16.0"
 bcrypt = "*"
 python-identitykeys = "*"
 pandas = "*"
+flask-cors = "*"
+flask-jwt-extended = "*"
+bson = "*"
 
 [requires]
 python_version = "3.6"

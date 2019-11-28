@@ -8,4 +8,4 @@ RUN pipenv sync
 
 COPY . .
 
-CMD ["pipenv","run", "python", "web/app.py"]
+CMD ["pipenv","run", "python", "web/backend/app.py"]

@@ -212,10 +212,10 @@ class Track(Resource):
 
         return jsonify(retJSON)
 
-api.add_resource(UserLogin, '/login')
-api.add_resource(UserRegistration, '/register')
-api.add_resource(Track, '/track')
+api.add_resource(UserLogin, '/users/login')
+api.add_resource(UserRegistration, '/users/register')
 api.add_resource(TwitterAccount, '/twitteraccounts')
+api.add_resource(Track, '/twitteraccounts/track')
 @app.route('/')
 def hello_world():
     return "Hello World!"

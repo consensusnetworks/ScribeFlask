@@ -71,8 +71,7 @@
           minLength: minLength(3)
         },
         Password: {
-          required,
-          minLength: minLength(10)
+          required
  
         },
       }
@@ -98,8 +97,8 @@
         // Instead of this timeout, here you can call your API
         window.setTimeout(() => {
           axios.post('/users/login', {
-            Username: this.Username,
-            Password: this.Password
+            Username: `${this.form.Username}`,
+            Password: `${this.form.Password}`
           }).then(res => {
               localStorage.setItem('usertoken', res.data.token)
           }).catch(err => {
@@ -118,7 +117,7 @@
         this.$v.$touch()
 
         if (!this.$v.$invalid) {
-          this.saveUser()
+          this.login()
         }
       }
     }

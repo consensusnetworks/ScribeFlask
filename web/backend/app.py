@@ -32,7 +32,7 @@ app.config['JWT_SECRET_KEY'] = 'secret'
 api = Api(app)
 jwt = JWTManager(app)
 # client = MongoClient("mongodb://db:27017")
-client = MongoClient("mongodb://localhost:27017")
+client = MongoClient("mongodb://db:27017")
 
 db = client.ScribeDatabase
 users = db["Users"]
@@ -43,10 +43,10 @@ class UserRegistration(Resource):
     def post(self):
         #step 1 get posted data by the user
         postedData = request.get_json()
-
+        print(postedData)
         #Get the data
-        username = postedData["username"]
-        password = postedData["password"]
+        username = postedData["Username"]
+        password = postedData["Password"]
         correct_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         email = postedData["email"]
         created = datetime.utcnow()
@@ -69,8 +69,8 @@ class UserRegistration(Resource):
 class UserLogin(Resource):
     def post(self):
         postedData = request.get_json()
-        username = postedData["username"]
-        password = postedData["password"]
+        username = postedData["Username"]
+        password = postedData["Password"]
         result = ""
 
         response = users.find_one({"Username": username})

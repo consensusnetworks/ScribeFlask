@@ -10,7 +10,7 @@
           <div class="md-layout md-gutter">
             <div class="md-layout-item md-small-size-100">
               <md-field :class="getValidationClass('Username')">
-                <label for="username">First Name</label>
+                <label for="username">Username</label>
                 <md-input name="username" id="username" autocomplete="username" v-model="form.Username" :disabled="sending" />
                 <span class="md-error" v-if="!$v.form.Username.required">The Username is required</span>
                 <span class="md-error" v-else-if="!$v.form.Username.minlength">Invalid Username</span>
@@ -19,7 +19,7 @@
 
             <div class="md-layout-item md-small-size-100">
               <md-field :class="getValidationClass('Password')">
-                <label for="Password">email</label>
+                <label for="Password">Password</label>
                 <md-input name="Password" id="Password" autocomplete="Password" v-model="form.Password" :disabled="sending" />
                 <span class="md-error" v-if="!$v.form.Password.required">The Password is required</span>
                 <span class="md-error" v-else-if="!$v.form.Password.minlength">Invalid Password</span>
@@ -79,7 +79,7 @@
         },
         Password: {
           required,
-          minLength: minLength(10)
+          minLength: minLength(5)
  
         },
         email: {
@@ -104,19 +104,19 @@
         this.form.Password = null
         this.form.email = null
       },
-      register () {
+      saveUser () {
         this.sending = true
 
         // Instead of this timeout, here you can call your API
         window.setTimeout(() => {
           axios.post('/users/register', {
-            Username: this.Username,
-            Password: this.Password,
-            email: this.email
+            Username: `${this.form.Username}`,
+            Password: `${this.form.Password}`,
+            email: `${this.form.email}`
           }).then(res => {
-              this.username = ''
+              this.Username = ''
               this.email = ''
-              this.password = ''
+              this.Password = ''
               router.push({ name: 'Login'})
 
           }).catch(err => {

@@ -1,6 +1,7 @@
 import bcrypt
 import json
 import logging
+from datetime import datetime
 import os
 from pymongo import MongoClient
 import time
@@ -9,6 +10,8 @@ from factom import Factomd, FactomWalletd
 from factom.exceptions import FactomAPIError 
 from flask import Flask, jsonify, request
 from flask_restful import Api, Resource
+from flask_cors import CORS
+from flask_jwt_extended import create_access_token, JWTManager
 from kafka import SimpleProducer, KafkaClient, KafkaConsumer, KafkaProducer
 from kafka.errors import KafkaError
 
@@ -23,11 +26,18 @@ fct_address = conf.FC_ADDR
 kafka_url = conf.KAFKA_URL
 
 app = Flask(__name__)
-api = Api(app)
 
-client = MongoClient("mongodb://db:27017")
+app.config['JWT_SECRET_KEY'] = 'secret'
+
+api = Api(app)
+jwt = JWTManager(app)
+# client = MongoClient("mongodb://db:27017")
+client = MongoClient("mongodb://localhost:27017")
+
 db = client.ScribeDatabase
 users = db["Users"]
+
+CORS(app)
 
 class UserRegistration(Resource):
     def post(self):
@@ -37,33 +47,47 @@ class UserRegistration(Resource):
         #Get the data
         username = postedData["username"]
         password = postedData["password"]
-
-        correct_pw = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
-
+        correct_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        email = postedData["email"]
+        created = datetime.utcnow()
         # Store username and password in database
-        users.insert({
+        user_id = users.insert({
             "Username": username,
             "Password": correct_pw,
+            "email": email,
+            "created": created,
             "Accounts":[]
         })
 
+        new_user = users.find_one({'_id': user_id})
         retJson = {
             "status": 200,
-            "msg": "You successfully signed up for the API",
+            "msg": new_user["email"] + ' registered',
         }
 
         return jsonify(retJson)
-        
-def verifyPw(username, password):
-    hashed_pw = users.find({
-        "Username": username
-    })[0]["Password"]
+class UserLogin(Resource):
+    def post(self):
+        postedData = request.get_json()
+        username = postedData["username"]
+        password = postedData["password"]
+        result = ""
 
-    if bcrypt.hashpw(password.encode('utf8'), hashed_pw) == hashed_pw:
-        return True
-    else: 
-        return False
+        response = users.find_one({"Username": username})
 
+        if response:
+            if bcrypt.checkpw( password.encode('utf8'), response["Password"]):
+                access_token = create_access_token(identity = {
+                    "username": response["Username"],
+                    "email": response["email"]
+                })
+                result = jsonify({"token": access_token})
+            else: 
+                result = jsonify({"error": "Invalid username and password"})
+        else:
+            result = jsonify({"result": "No results found"})
+
+        return result
 class TwitterAccount(Resource):
     def post(self):
         #Step 1 get the posted data
@@ -188,9 +212,10 @@ class Track(Resource):
 
         return jsonify(retJSON)
 
-api.add_resource(UserRegistration, '/register')
-api.add_resource(Track, '/track')
+api.add_resource(UserLogin, '/users/login')
+api.add_resource(UserRegistration, '/users/register')
 api.add_resource(TwitterAccount, '/twitteraccounts')
+api.add_resource(Track, '/twitteraccounts/track')
 @app.route('/')
 def hello_world():
     return "Hello World!"

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <form novalidate class="md-layout" @submit.prevent="validateUser">
+    <form novalidate class="md-layout md-alignment-center" @submit.prevent="validateUser">
       <md-card class="md-layout-item md-size-50 md-small-size-100">
         <md-card-header>
           <div class="md-title">Please Login</div>
@@ -19,7 +19,7 @@
 
             <div class="md-layout-item md-small-size-100">
               <md-field :class="getValidationClass('Password')">
-                <label for="Password">email</label>
+                <label for="Password">Password</label>
                 <md-input name="Password" id="Password" autocomplete="Password" v-model="form.Password" :disabled="sending" />
                 <span class="md-error" v-if="!$v.form.Password.required">The Password is required</span>
                 <span class="md-error" v-else-if="!$v.form.Password.minlength">Invalid Password</span>
@@ -101,6 +101,9 @@
             Password: `${this.form.Password}`
           }).then(res => {
               localStorage.setItem('usertoken', res.data.token)
+              this.Username = ''
+              this.Password = ''
+              router.push({ name: 'Home'})
           }).catch(err => {
               console.log(err)
           }),

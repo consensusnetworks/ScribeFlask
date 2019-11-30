@@ -1,7 +1,7 @@
 <template>
   <div>
-    <form novalidate class="md-layout" @submit.prevent="validateUser">
-      <md-card class="md-layout-item md-size-50 md-small-size-100">
+    <form novalidate class="md-layout md-alignment-center" @submit.prevent="validateUser">
+      <md-card class="md-layout-item md-size-50 md-small-size-100 ">
         <md-card-header>
           <div class="md-title">Please Register</div>
         </md-card-header>
@@ -48,15 +48,15 @@
 </template>
 
 <script>
-  import { validationMixin } from 'vuelidate';
+  import { validationMixin } from 'vuelidate'
   import {
     required,
     email,
     minLength,
     maxLength
-  } from 'vuelidate/lib/validators';
-  import axios from 'axios';
-  import router from '../router';
+  } from 'vuelidate/lib/validators'
+  import axios from 'axios'
+  import router from '../router'
 
   export default {
     name: 'FormValidation',
@@ -104,7 +104,7 @@
         this.form.Password = null
         this.form.email = null
       },
-      saveUser () {
+      register () {
         this.sending = true
 
         // Instead of this timeout, here you can call your API
@@ -131,12 +131,18 @@
         this.$v.$touch()
 
         if (!this.$v.$invalid) {
-          this.saveUser()
+          this.register()
         }
       }
     }
   }
 </script>
 
-<style>
+<style scoped>
+  .md-progress-bar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+  }
 </style>

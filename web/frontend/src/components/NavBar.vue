@@ -1,32 +1,14 @@
 <template>
   <div>
-    <md-toolbar v-if="auth=='logged-in'" class="md-accent" md-elevation="1">
-
-      <md-menu md-direction="bottom-end">
-        <md-button class="md-icon-button" md-menu-trigger>
-            <md-icon>settings</md-icon>
-        </md-button>
-        <md-menu-content>
-            <md-menu-item>
-                <router-link
-                    :to="{ name: 'Home' }"
-                    class="button-text"
-                    >Home
-                </router-link>
-            </md-menu-item>
-            <md-menu-item>
-                <a  class="button-text" href="/logout">Logout</a>
-            </md-menu-item>
-        </md-menu-content>
-      </md-menu>
-      <md-badge md-content="1">
-          <md-button class="md-icon-button">
-              <md-icon>notifications</md-icon>
-          </md-button>
-      </md-badge>
-
+    <md-toolbar v-if="auth=='loggedin'" class="md-accent" md-elevation="1">
+      <h3>
+          <router-link :to="{ name: 'Home'}" class="md-title" style="flex: 1">
+            Scribe
+          </router-link>
+      </h3>
+        <md-button v-on:click="logout">Logout</md-button>
     </md-toolbar>
-      <md-toolbar v-if="auth==''" class="md-accent" md-elevation="1">
+      <md-toolbar v-if="auth===''" class="md-accent" md-elevation="1">
         <md-button>
           <router-link :to="{ name: 'Login'}" class="button-text">
             Login
@@ -43,6 +25,7 @@
 
 <script>
 import EventBus from './EventBus'
+import router from '../router'
 
 EventBus.$on('logged-in', test => {
   console.log(test)
@@ -58,7 +41,12 @@ export default {
   methods: {
     logout() {
         localStorage.removeItem('usertoken')
-      }
+        this.emitMethod()
+        router.push({ name: 'Login'})
+      },
+     emitMethod() {
+          EventBus.$emit('logged-in', '')
+      },
   },
   mounted() {
     EventBus.$on('logged-in', status => {
@@ -69,5 +57,24 @@ export default {
 </script>
 
 <style>
-
+.button-text {
+    color: white;
+}
+.md-toolbar {
+  background-color: #29b6f6  !important;
+}
+.md-button {
+  color: white;
+}
+.md-menu-item {
+    background-color: #29b6f6;
+}
+.md-title {
+    font-weight: bold;
+    font-size: 130%;
+    color: white;
+}
+.md-title:hover {
+    color: #f56f12 !important;
+}
 </style>

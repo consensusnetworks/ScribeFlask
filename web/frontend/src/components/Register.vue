@@ -114,9 +114,6 @@
             Password: `${this.form.Password}`,
             email: `${this.form.email}`
           }).then(res => {
-              this.Username = ''
-              this.email = ''
-              this.Password = ''
               router.push({ name: 'Login'})
 
           }).catch(err => {

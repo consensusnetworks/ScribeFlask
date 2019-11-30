@@ -41,16 +41,16 @@
 </template>
 
 <script>
-  import { validationMixin } from 'vuelidate';
+  import { validationMixin } from 'vuelidate'
   import {
     required,
     email,
     minLength,
     maxLength
-  } from 'vuelidate/lib/validators';
-  import axios from 'axios';
-  import router from '../router';
-  import EventBus from './EventBus';
+  } from 'vuelidate/lib/validators'
+  import axios from 'axios'
+  import router from '../router'
+  import EventBus from './EventBus'
 
   export default {
     name: 'FormValidation',

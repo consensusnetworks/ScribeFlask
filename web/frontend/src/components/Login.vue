@@ -10,7 +10,7 @@
           <div class="md-layout md-gutter">
             <div class="md-layout-item md-small-size-100">
               <md-field :class="getValidationClass('Username')">
-                <label for="username">First Name</label>
+                <label for="username">Username</label>
                 <md-input name="username" id="username" autocomplete="username" v-model="form.Username" :disabled="sending" />
                 <span class="md-error" v-if="!$v.form.Username.required">The Username is required</span>
                 <span class="md-error" v-else-if="!$v.form.Username.minlength">Invalid Username</span>
@@ -31,7 +31,7 @@
         <md-progress-bar md-mode="indeterminate" v-if="sending" />
 
         <md-card-actions>
-          <md-button type="submit" class="md-primary" :disabled="sending">Login</md-button>
+          <md-button type="submit" class="md-primary button-text" :disabled="sending">Login</md-button>
         </md-card-actions>
       </md-card>
 
@@ -127,5 +127,8 @@
   }
 </script>
 
-<style>
+<style scoped>
+.button-text {
+    color: #29b6f6;
+}
 </style>

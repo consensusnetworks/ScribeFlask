@@ -38,7 +38,7 @@
         <md-progress-bar md-mode="indeterminate" v-if="sending" />
 
         <md-card-actions>
-          <md-button type="submit" class="md-primary" :disabled="sending">Register</md-button>
+          <md-button type="submit" class="md-primary button-text" :disabled="sending">Register</md-button>
         </md-card-actions>
       </md-card>
 
@@ -141,5 +141,8 @@
     top: 0;
     right: 0;
     left: 0;
+  }
+  .button-text {
+      color: #29b6f6;
   }
 </style>

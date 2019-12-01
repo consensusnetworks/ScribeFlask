@@ -32,14 +32,14 @@
             </md-card-content>
 
               <md-card-actions>
-                <md-button type="submit" class="md-raised" :disabled="submitting">Add Account</md-button>
+                <md-button type="submit" class="md-raised button-text" :disabled="submitting">Add Account</md-button>
               </md-card-actions>
           </md-card>
 
           <md-snackbar :md-duration="10000" :md-active.sync="success" md-persistent>
             This Account is now being tracked! We will notify you when their tweets are being Factomized!
           </md-snackbar>
-      </form>
+      </form> 
     </div>
   </div>
 
@@ -47,13 +47,14 @@
 
 
 <script>
+  import axios from 'axios'
   import { validationMixin } from 'vuelidate'
   import {
     required,
     minLength
   } from 'vuelidate/lib/validators'
   export default {
-    name: "AddAccounts",
+    name: "Accountform",
     mixins: [validationMixin],
     data() {
       return {
@@ -89,15 +90,23 @@
     methods: {
         handleSubmit() {
             this.submitting = true
-            this.clearStatus()
+            window.setTimeout(() => {
+                axios.post('/users/twitteraccounts', {
+                  handle: `${this.twitteraccount.handle}`,
+                  twitterid: `${this.twitteraccount.twitterid}`
+                }).then(res => {
+                    this.$emit('add:twitteraccount', this.twitteraccount)
+                    this.twitteraccounts = [...this.twitteraccounts, res]
+                    this.twitteraccount.handle = ''
+                    this.twitteraccount.twitterid = ''
+                }).catch(err => {
+                    console.log(err)
+                }),
+                this.clearStatus()
+              }, 1500)
             if (this.invalidHandle || this.invalidTwitterID) {
             this.error = true
             return
-            }
-            this.$emit('add:twitteraccount', this.twitteraccount)
-            this.twitteraccount = {
-                handle: '',
-                twitterid: '',
             }
             this.error = false
             this.success = true
@@ -132,6 +141,9 @@
   [class*='-message'] {
     font-weight: 500;
   }
+  .button-text {
+    color: white;
+}
   .error-message {
     color: #d33c40;
   }

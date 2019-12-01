@@ -95,27 +95,17 @@ class TwitterAccount(Resource):
 
         print(postedData)
         #Step 2 is to read the data
-        username = postedData["username"]
-        password = postedData["password"]
+        username = users.find_one("Username")
+        # password = postedData["password"]
         handle = postedData["handle"]
-        twitterid = str(postedData["twitter_id"])
-        
-        
-        # Step 3 verify the username pw match
-        correct_pw = verifyPw(username, password)
-
-        if not correct_pw:
-            retJson = {
-                "status":302
-            }
-            return jsonify(retJson)
+        twitterid = str(postedData["twitterid"])
 
         # Step3 Generate Chain for Twitter Account
         factomd = Factomd(host=factom_url, ec_address=ec_address, fct_address=fct_address, username='rpc_username',password='rpc_password')
         walletd = FactomWalletd(host=wallet_url, ec_address=ec_address, fct_address=fct_address, username='rpc_username',password='rpc_password')
         print(factomd, walletd)
         try:
-            resp = walletd.new_chain(factomd,[ 'TwitterBank Record',str(twitterid), 'fulltest5'],
+            resp = walletd.new_chain(factomd,[ 'TwitterBank Record',str(twitterid), 'fulltest6'],
                                     'This is the start of this users TwitterBank Records', 
                                     ec_address=ec_address) 
             print(resp)             
@@ -214,7 +204,7 @@ class Track(Resource):
 
 api.add_resource(UserLogin, '/users/login')
 api.add_resource(UserRegistration, '/users/register')
-api.add_resource(TwitterAccount, '/twitteraccounts')
+api.add_resource(TwitterAccount, '/users/twitteraccounts')
 api.add_resource(Track, '/twitteraccounts/track')
 @app.route('/')
 def hello_world():

@@ -1,14 +1,6 @@
 <template>
   <div>
-    <md-toolbar class="md-accent" md-elevation="1">
-      <div>
-        <h1 class="Text-center">Welcome to Scribe!</h1>
-      </div>
-    </md-toolbar>
-    <p>Username</p>
-    <p>{{Username}}</p>
-    <p>email</p>
-    <p>{{email}}</p>
+        <h1 class="center">Welcome to Scribe!</h1>
     <accountform></accountform>
     <accounttable></accounttable>
   </div>
@@ -26,7 +18,8 @@ export default {
     const decoded = jwtDecode(token)
     return {
       Username: decoded.identity.username,
-      email: decoded.identity.email
+      email: decoded.identity.email,
+      twitteraccounts: []
     }
   },
   components: {
@@ -35,3 +28,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.center {
+ text-align: center
+}
+</style>

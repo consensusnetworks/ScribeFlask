@@ -7,11 +7,13 @@
 
 <script>
 import Navbar from './components/Navbar'
+import Home from './components/Home'
 
 export default {
   name: 'App',
   components: {
-    'Navbar': Navbar
+    'Navbar': Navbar,
+    'Home': Home
   }
 }
 </script>

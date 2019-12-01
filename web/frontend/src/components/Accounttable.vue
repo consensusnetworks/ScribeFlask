@@ -1,7 +1,7 @@
 <template>
   <div class="container">
         <div id="account-table">
-            <p v-if="accounts.length < 1" class="empty-table">
+            <p v-if="twitteraccounts.length < 1" class="empty-table">
                 No account
             </p>
             <md-table v-model="twitteraccounts" md-card md-fixed-header v-else>
@@ -33,7 +33,7 @@
   export default {
     name: 'AccountTable',
     props: {
-        accounts: Array,
+        twitteraccounts: Array,
     }
   }
 </script>

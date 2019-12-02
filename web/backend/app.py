@@ -134,8 +134,9 @@ class TwitterAccount(Resource):
                 }
         })
         retJSON = {
-            'Message': str(chainid) + " successfully created!",
-            'Status Code': 200
+            'handle': handle,
+            'twitterid': twitterid,
+            'chainid': str(chainid),
         }
 
         return jsonify(retJSON)

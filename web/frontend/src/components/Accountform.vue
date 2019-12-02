@@ -48,6 +48,7 @@
 
 <script>
   import axios from 'axios'
+  import EventBus from './EventBus'
   import { validationMixin } from 'vuelidate'
   import {
     required,
@@ -64,7 +65,8 @@
         twitteraccount: {
           handle: '',
           twitterid: '',
-        }
+          chainid: ''
+        },
       }
     },
     validations: {
@@ -88,17 +90,25 @@
         },
     },
     methods: {
-        handleSubmit() {
+        addAccount() {
             this.submitting = true
             window.setTimeout(() => {
                 axios.post('/users/twitteraccounts', {
                   handle: `${this.twitteraccount.handle}`,
                   twitterid: `${this.twitteraccount.twitterid}`
                 }).then(res => {
-                    this.$emit('add:twitteraccount', this.twitteraccount)
-                    this.twitteraccounts = [...this.twitteraccounts, res]
-                    this.twitteraccount.handle = ''
-                    this.twitteraccount.twitterid = ''
+                    console.log(res.data)
+                    this.twitteraccount.chainid = res.data.chainid
+                    console.log(this.twitteraccount)
+                    this.$emit('addAccount', this.twitteraccount)
+                    console.log(this.twitteraccount)
+                    this.twitteraccount = {
+                      handle: '',
+                      twitterid: '',
+                      chainid: ''
+
+                    }
+
                 }).catch(err => {
                     console.log(err)
                 }),
@@ -127,7 +137,7 @@
         validateAccount () {
           this.$v.$touch()
           if (!this.$v.$invalid) {
-            this.handleSubmit()
+            this.addAccount()
           }
         }
     }

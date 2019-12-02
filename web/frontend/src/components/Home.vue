@@ -1,8 +1,8 @@
 <template>
   <div>
         <h1 class="center">Welcome to Scribe!</h1>
-    <accountform></accountform>
-    <accounttable></accounttable>
+        <accountform @addAccount="updateMessage" />
+        <accounttable :account="childData"/>
   </div>
 </template>
 
@@ -13,18 +13,26 @@ import Accountform from './Accountform'
 import Accounttable from './Accounttable'
 import Navbar from './Navbar'
 export default {
-  data () {
+  data: function () {
     const token = localStorage.usertoken
     const decoded = jwtDecode(token)
     return {
       Username: decoded.identity.username,
       email: decoded.identity.email,
-      twitteraccounts: []
+      childData: "",
     }
   },
   components: {
     Accountform,
     Accounttable,
+  },
+  methods: {
+    updateMessage(variable) {
+      this.childData=variable;
+      console.log(this.childData)
+
+
+    }
   }
 }
 </script>

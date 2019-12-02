@@ -14,8 +14,9 @@ export default {
   components: {
     'Navbar': Navbar,
     'Home': Home
-  }
+  },
 }
+
 </script>
 
 <style>

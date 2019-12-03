@@ -19,7 +19,7 @@ export default {
     return {
       Username: decoded.identity.username,
       email: decoded.identity.email,
-      childData: "",
+      childData: {},
     }
   },
   components: {
@@ -29,6 +29,7 @@ export default {
   methods: {
     updateMessage(variable) {
       this.childData=variable;
+      console.log(this.childData)
       console.log(this.childData)
 
 

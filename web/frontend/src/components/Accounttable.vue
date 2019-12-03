@@ -1,7 +1,7 @@
-<template v-model="twitteraccounts">
+<template>
   <div class="container">
-        <li  v-for="(message, index) in twitteraccounts" :item="message" :key="index">
-            {{ message }}
+        <li  v-for="account in twitteraccounts" v-bind:key="account.id">
+            {{ account }}
         </li>
   </div>
 </template>
@@ -12,19 +12,19 @@
     props: {
         account: {
             type: Object
-        },
+        }
     },
-    data: function() {
+    data () {
         return {
             twitteraccounts: [],
         };
     },
     watch: {
         account: function() {
-            console.log(account)
-            this.twitteraccounts.push(account)
+            console.log(this.account)
+            this.twitteraccounts.push(this.account)
         }
-    },
+    }
   }
   
 </script>

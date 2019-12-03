@@ -1,7 +1,8 @@
 <template>
 
-  <div id="account-form">
-    <div class="container">
+  <div id="account-form" class= "md-layout md-gutter" >
+    <div class = "md-layout-item"></div>
+    <div class="md-layout-item">
       <form @submit.prevent="validateAccount">
         <md-card class="md-layout-item md-alignment-center">
             <md-card-header>
@@ -41,6 +42,7 @@
           </md-snackbar>
       </form> 
     </div>
+    <div class="md-layout-item"></div>
   </div>
 
 </template>
@@ -176,5 +178,13 @@
   .md-snackbar {
     background-color: #f56f12;
     color: white;
+  }
+  .md-layout-item {
+     height: 40px;
+
+      width: 100%;
+      height: 100%;
+      display: block;
+      content: " ";
   }
 </style>

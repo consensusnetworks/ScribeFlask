@@ -77,4 +77,5 @@ export default {
 .md-title:hover {
     color: #f56f12 !important;
 }
+
 </style>

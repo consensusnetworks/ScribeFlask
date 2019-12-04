@@ -1,6 +1,6 @@
 <template>
   <div>
-    <form novalidate class="md-layout" @submit.prevent="validateUser">
+    <form novalidate class="md-layout md-alignment-center" @submit.prevent="validateUser">
       <md-card class="md-layout-item md-size-50 md-small-size-100">
         <md-card-header>
           <div class="md-title">Please Login</div>
@@ -10,7 +10,7 @@
           <div class="md-layout md-gutter">
             <div class="md-layout-item md-small-size-100">
               <md-field :class="getValidationClass('Username')">
-                <label for="username">First Name</label>
+                <label for="username">Username</label>
                 <md-input name="username" id="username" autocomplete="username" v-model="form.Username" :disabled="sending" />
                 <span class="md-error" v-if="!$v.form.Username.required">The Username is required</span>
                 <span class="md-error" v-else-if="!$v.form.Username.minlength">Invalid Username</span>
@@ -19,7 +19,7 @@
 
             <div class="md-layout-item md-small-size-100">
               <md-field :class="getValidationClass('Password')">
-                <label for="Password">email</label>
+                <label for="Password">Password</label>
                 <md-input name="Password" id="Password" autocomplete="Password" v-model="form.Password" :disabled="sending" />
                 <span class="md-error" v-if="!$v.form.Password.required">The Password is required</span>
                 <span class="md-error" v-else-if="!$v.form.Password.minlength">Invalid Password</span>
@@ -31,7 +31,7 @@
         <md-progress-bar md-mode="indeterminate" v-if="sending" />
 
         <md-card-actions>
-          <md-button type="submit" class="md-primary" :disabled="sending">Login</md-button>
+          <md-button type="submit" class="md-primary button-text" :disabled="sending">Login</md-button>
         </md-card-actions>
       </md-card>
 
@@ -41,16 +41,16 @@
 </template>
 
 <script>
-  import { validationMixin } from 'vuelidate';
+  import { validationMixin } from 'vuelidate'
   import {
     required,
     email,
     minLength,
     maxLength
-  } from 'vuelidate/lib/validators';
-  import axios from 'axios';
-  import router from '../router';
-  import EventBus from './EventBus';
+  } from 'vuelidate/lib/validators'
+  import axios from 'axios'
+  import router from '../router'
+  import EventBus from './EventBus'
 
   export default {
     name: 'FormValidation',
@@ -71,8 +71,7 @@
           minLength: minLength(3)
         },
         Password: {
-          required,
-          minLength: minLength(10)
+          required
  
         },
       }
@@ -98,10 +97,13 @@
         // Instead of this timeout, here you can call your API
         window.setTimeout(() => {
           axios.post('/users/login', {
-            Username: this.Username,
-            Password: this.Password
+            Username: `${this.form.Username}`,
+            Password: `${this.form.Password}`
           }).then(res => {
               localStorage.setItem('usertoken', res.data.token)
+              this.Username = ''
+              this.Password = ''
+              router.push({ name: 'Home'})
           }).catch(err => {
               console.log(err)
           }),
@@ -118,12 +120,15 @@
         this.$v.$touch()
 
         if (!this.$v.$invalid) {
-          this.saveUser()
+          this.login()
         }
       }
     }
   }
 </script>
 
-<style>
+<style scoped>
+.button-text {
+    color: #29b6f6;
+}
 </style>

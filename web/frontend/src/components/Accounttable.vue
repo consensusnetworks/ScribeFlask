@@ -10,12 +10,6 @@
                 <md-table-cell md-label="Twitter Handle" md-sort-by="handle">{{account.handle}}</md-table-cell>
                 <md-table-cell md-label="Twitter ID" md-sort-by="twitterid">{{account.twitterid}}</md-table-cell>
                 <md-table-cell md-label="FactomChainid" md-sort-by="chainid">{{account.chainid}}</md-table-cell>
-                <md-table-cell md-label="Track"> 
-                            <md-button 
-                                class="md-raised button-text"
-                                > Track
-                            </md-button>
-                </md-table-cell>
             </md-table-row> 
         </md-table>
     </div>

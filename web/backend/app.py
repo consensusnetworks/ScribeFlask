@@ -105,7 +105,7 @@ class TwitterAccount(Resource):
         walletd = FactomWalletd(host=wallet_url, ec_address=ec_address, fct_address=fct_address, username='rpc_username',password='rpc_password')
         print(factomd, walletd)
         try:
-            resp = walletd.new_chain(factomd,[ 'TwitterBank Record',str(twitterid), 'fulltest6'],
+            resp = walletd.new_chain(factomd,[ 'TwitterBank Record',str(twitterid), 'fulltest7'],
                                     'This is the start of this users TwitterBank Records', 
                                     ec_address=ec_address) 
             print(resp)             
@@ -147,20 +147,13 @@ class Track(Resource):
         postedData = request.get_json()
 
         #Step 2 is to read the data
-        username = postedData["username"]
-        password = postedData["password"]
+        # username = postedData["username"]
+        # password = postedData["password"]
         handle = postedData["handle"]
         twitterid = str(postedData["twitter_id"])
         chainid = postedData["chainid"]
 
         #Step 3 verify the username pw match
-        correct_pw = verifyPw(username, password)
-
-        if not correct_pw:
-            retJson = {
-                "status":302
-            }
-            return jsonify(retJson)
         
         # Step 4 get the twitterid for the account you want to track
         twitteraccount = users.find_one({"Accounts.twitterid": twitterid})
@@ -206,7 +199,7 @@ class Track(Resource):
 api.add_resource(UserLogin, '/users/login')
 api.add_resource(UserRegistration, '/users/register')
 api.add_resource(TwitterAccount, '/users/twitteraccounts')
-api.add_resource(Track, '/twitteraccounts/track')
+api.add_resource(Track, '/users/twitteraccounts/track')
 @app.route('/')
 def hello_world():
     return "Hello World!"

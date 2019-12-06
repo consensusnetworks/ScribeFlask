@@ -33,7 +33,7 @@
             </md-card-content>
 
               <md-card-actions>
-                <md-button type="submit" class="md-raised button-text" :disabled="submitting">Add Account</md-button>
+                <md-button type="submit" class="md-raised button-text" :disabled="submitting">Track Account</md-button>
               </md-card-actions>
           </md-card>
 

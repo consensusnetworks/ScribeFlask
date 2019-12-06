@@ -31,7 +31,6 @@ app.config['JWT_SECRET_KEY'] = 'secret'
 
 api = Api(app)
 jwt = JWTManager(app)
-# client = MongoClient("mongodb://db:27017")
 client = MongoClient("mongodb://db:27017")
 
 db = client.ScribeDatabase
@@ -103,14 +102,11 @@ class TwitterAccount(Resource):
         # Step3 Generate Chain for Twitter Account
         factomd = Factomd(host=factom_url, ec_address=ec_address, fct_address=fct_address, username='rpc_username',password='rpc_password')
         walletd = FactomWalletd(host=wallet_url, ec_address=ec_address, fct_address=fct_address, username='rpc_username',password='rpc_password')
-        print(factomd, walletd)
         try:
-            resp = walletd.new_chain(factomd,[ 'TwitterBank Record',str(twitterid), 'fulltest6'],
+            resp = walletd.new_chain(factomd,[ 'TwitterBank Record',str(twitterid), 'fulltest10'],
                                     'This is the start of this users TwitterBank Records', 
-                                    ec_address=ec_address) 
-            print(resp)             
+                                    ec_address=ec_address)              
             chain_ID = resp['chainid']
-            print(chain_ID)
             chainid = chain_ID
 
         except FactomAPIError as e:
@@ -128,85 +124,43 @@ class TwitterAccount(Resource):
                             "handle": handle,
                             "twitterid": twitterid,
                             "chainid": chainid,
-                            "tracking": ""
-                        }
-                    ]
-                }
-        })
-        retJSON = {
-            'handle': handle,
-            'twitterid': twitterid,
-            'chainid': str(chainid),
-        }
-
-        return jsonify(retJSON)
-
-class Track(Resource):
-    def post(self):
-        #Step 1 get the posted data
-        postedData = request.get_json()
-
-        #Step 2 is to read the data
-        username = postedData["username"]
-        password = postedData["password"]
-        handle = postedData["handle"]
-        twitterid = str(postedData["twitter_id"])
-        chainid = postedData["chainid"]
-
-        #Step 3 verify the username pw match
-        correct_pw = verifyPw(username, password)
-
-        if not correct_pw:
-            retJson = {
-                "status":302
-            }
-            return jsonify(retJson)
-        
-        # Step 4 get the twitterid for the account you want to track
-        twitteraccount = users.find_one({"Accounts.twitterid": twitterid})
-        account = twitteraccount['Accounts']
-        taccount = account[0]
-
-        #Step 4 Send Account object to Kafka
-        kafka = KafkaClient("kafka:9093")
-        # client=KafkaClient('localhost:9092')
-        producer = SimpleProducer(kafka, value_serializer=lambda v: json.dumps(v).encode('utf-8'))
-        try:
-            logging.info('sending message %s to kafka', chainid)
-            producer.send_messages('Scribe', json.dumps(taccount).encode('utf-8'))
-            # producer.send('Scribe', taccount)
-            logging.info('%s sent!', taccount)
-        except KafkaError as error:
-            logging.warning('The message was not sent to the mempool, caused by %s', error)
-
-        print('Sending Condition to Mempool!')
-
-        #Step 4 Store the Account in the database for a user
-        users.update({
-            "Username":username,
-        }, {
-            "$set": {
-                    "Accounts":[
-                        {
-                            "handle": handle,
-                            "twitterid": twitterid,
-                            "chainid": chainid,
                             "tracking": "yes"
                         }
                     ]
                 }
         })
-        retJSON = {
-            'Message': str(taccount) + " successfully tracked!",
-            'Status Code': 200
+        
+        #Step 5 Send Account to Faust
+        time.sleep(1)
+        account = {
+           "handle": handle,
+           "twitterid": twitterid,
+           "chainid": chainid,
         }
 
+        kafka = KafkaClient("kafka:9093")
+        producer = SimpleProducer(kafka, value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+        try:
+            logging.info('sending message %s to kafka', chainid)
+            producer.send_messages('Scribe', json.dumps(account).encode('utf-8'))
+            logging.info('%s sent!', account)
+        except KafkaError as error:
+            logging.warning('The message was not sent to the mempool, caused by %s', error)
+
+        print('Sending Condition to Mempool!')
+
+        retJSON = {
+                    'handle': handle,
+                    'twitterid': twitterid,
+                    'chainid': str(chainid),
+                }
+
         return jsonify(retJSON)
+
 
 api.add_resource(UserLogin, '/users/login')
 api.add_resource(UserRegistration, '/users/register')
 api.add_resource(TwitterAccount, '/users/twitteraccounts')
-api.add_resource(Track, '/twitteraccounts/track')
 @app.route('/')
 def hello_world():
     return "Hello World!"

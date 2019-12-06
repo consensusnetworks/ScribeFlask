@@ -104,7 +104,7 @@ class TwitterAccount(Resource):
         walletd = FactomWalletd(host=wallet_url, ec_address=ec_address, fct_address=fct_address, username='rpc_username',password='rpc_password')
         print(factomd, walletd)
         try:
-            resp = walletd.new_chain(factomd,[ 'TwitterBank Record',str(twitterid), 'fulltest9'],
+            resp = walletd.new_chain(factomd,[ 'TwitterBank Record',str(twitterid), 'fulltest10'],
                                     'This is the start of this users TwitterBank Records', 
                                     ec_address=ec_address) 
             print(resp)             

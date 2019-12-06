@@ -11,6 +11,8 @@ services:
       - scribe-net
   db:
     build: ./db
+    ports:
+      - 27017:27017
     networks:
       - scribe-net
   zookeeper:

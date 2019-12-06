@@ -34,7 +34,6 @@ class TwitterAccount(faust.Record, serializer='json'):
     handle: str
     twitterid: str
     chainid: str
-    tracking: str
 
 source_topic = app.topic('Scribe', value_type=TwitterAccount)
 @app.agent(source_topic)

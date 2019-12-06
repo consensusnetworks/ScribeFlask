@@ -31,7 +31,6 @@ app.config['JWT_SECRET_KEY'] = 'secret'
 
 api = Api(app)
 jwt = JWTManager(app)
-# client = MongoClient("mongodb://db:27017")
 client = MongoClient("mongodb://db:27017")
 
 db = client.ScribeDatabase
@@ -105,7 +104,7 @@ class TwitterAccount(Resource):
         walletd = FactomWalletd(host=wallet_url, ec_address=ec_address, fct_address=fct_address, username='rpc_username',password='rpc_password')
         print(factomd, walletd)
         try:
-            resp = walletd.new_chain(factomd,[ 'TwitterBank Record',str(twitterid), 'fulltest7'],
+            resp = walletd.new_chain(factomd,[ 'TwitterBank Record',str(twitterid), 'fulltest9'],
                                     'This is the start of this users TwitterBank Records', 
                                     ec_address=ec_address) 
             print(resp)             
@@ -128,16 +127,38 @@ class TwitterAccount(Resource):
                             "handle": handle,
                             "twitterid": twitterid,
                             "chainid": chainid,
-                            "tracking": ""
+                            "tracking": "yes"
                         }
                     ]
                 }
         })
-        retJSON = {
-            'handle': handle,
-            'twitterid': twitterid,
-            'chainid': str(chainid),
+        
+        #Step 5 Send Account to Faust
+        time.sleep(1)
+        account = {
+           "handle": handle,
+           "twitterid": twitterid,
+           "chainid": chainid,
         }
+
+        kafka = KafkaClient("kafka:9093")
+        # client=KafkaClient('localhost:9092')
+        producer = SimpleProducer(kafka, value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+        try:
+            logging.info('sending message %s to kafka', chainid)
+            producer.send_messages('Scribe', json.dumps(account).encode('utf-8'))
+            # producer.send('Scribe', taccount)
+            logging.info('%s sent!', account)
+        except KafkaError as error:
+            logging.warning('The message was not sent to the mempool, caused by %s', error)
+
+        print('Sending Condition to Mempool!')
+
+        retJSON = {
+                    'handle': handle,
+                    'twitterid': twitterid,
+                    'chainid': str(chainid),
+                }
 
         return jsonify(retJSON)
 

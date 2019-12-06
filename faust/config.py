@@ -8,19 +8,19 @@ class Config(object):
     DEBUG = False
     TESTING = False
     KAFKA_URL = os.environ.get('KAFKA_URL', 'kafka://localhost:9092')
-    FC_ADDR = os.environ.get('FC_ADDR', 'FA3qdHM7pH5JDw6EaM9x5vxRtsRSy16xCEMhaJDSmECUgZQy9ob3')
-    EC_ADDR = os.environ.get('EC_ADDR', 'EC34ywXCgXE4qA3Pr52QzCfnXptKXySeYr3QcPNgqWZLyNRckgrq')
+    FC_ADDR = os.environ.get('FC_ADDR', 'YOUR_FC_ADDRESS')
+    EC_ADDR = os.environ.get('EC_ADDR', 'YOUR_EC_ADDRESS')
 
     RPC_USER = os.environ.get('RPC_USER', None)
     RPC_PASS = os.environ.get('RPC_PASS', None)
 
-    WALLET_BASE_URL = os.environ.get('WALLET_BASE_URL', 'http://18.222.184.135:8089')
-    FACTOM_BASE_URL = os.environ.get('FACTOM_BASE_URL', 'http://18.222.184.135:8088')
+    WALLET_BASE_URL = os.environ.get('WALLET_BASE_URL', 'http://YourHost:8089')
+    FACTOM_BASE_URL = os.environ.get('FACTOM_BASE_URL', 'http://YourHost:8088')
 
-    TWITTER_KEY = os.environ.get('TWITTER_KEY', '8OkElZxTSOxPTHRzMxlkY0F5E')
-    TWITTER_SECRET = os.environ.get('TWITTER_SECRET', 'CVFmGkBkwchWhjRdDY6x3gOWxouhP6z4ohpgNlqgSdx1QUzYJz')
-    TWITTER_APP_KEY = os.environ.get('TWITTER_APP_KEY', '1088516191436656640-if27Ij2ssb3PWI5g5USIKi1BOtN08I')
-    TWITTER_APP_SECRET = os.environ.get('TWITTER_APP_SECRET', 'u4VmQZ256FTT5IrwEpErUeLr2Ta8W9CJJdgEpa5uznj2H')
+    TWITTER_KEY = os.environ.get('TWITTER_KEY', 'Your_Twitter_KEY')
+    TWITTER_SECRET = os.environ.get('TWITTER_SECRET', 'Your_Twitter_Secret')
+    TWITTER_APP_KEY = os.environ.get('TWITTER_APP_KEY', 'Your_Twitter_App_Key')
+    TWITTER_APP_SECRET = os.environ.get('TWITTER_APP_SECRET', 'Your_Twitter_App_Secret')
 
 
 

@@ -1,13 +1,14 @@
 version: '3'
 services:
-  web:
+  api:
     build: ./web/backend
     container_name: api
     ports:
-      - "5000:5000"
+      - "9000"
     links:
       - db
       - kafka
+    restart: always
     networks:
       - scribe-net
   db:
@@ -15,13 +16,15 @@ services:
     container_name: db
     ports:
       - 27017:27017
+    restart: always
     networks:
       - scribe-net
   frontend:
     build: ./web/frontend
     container_name: frontend
     ports:
-      - "80:80"
+      - "80"
+    restart: always
     networks:
       - scribe-net
   zookeeper:
@@ -29,6 +32,7 @@ services:
     container_name: zookeeper
     ports:
       - "2181:2181"
+    restart: always
     networks:
       - scribe-net
   kafka:
@@ -49,6 +53,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
     networks:
       - scribe-net
   nginx:
@@ -58,6 +63,7 @@ services:
     ports:
       - "8000:8000"
       - "8001:80"
+    restart: always
     networks:
       - scribe-net
     

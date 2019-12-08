@@ -109,7 +109,7 @@
 
         // Instead of this timeout, here you can call your API
         window.setTimeout(() => {
-          axios.post('/users/register', {
+          axios.post('http://localhost:8000/users/register', {
             Username: `${this.form.Username}`,
             Password: `${this.form.Password}`,
             email: `${this.form.email}`

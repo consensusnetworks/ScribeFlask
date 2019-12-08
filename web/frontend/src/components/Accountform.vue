@@ -95,7 +95,7 @@
         addAccount() {
             this.submitting = true
             window.setTimeout(() => {
-                axios.post('/users/twitteraccounts', {
+                axios.post('http://localhost:8000/users/twitteraccounts', {
                   handle: `${this.twitteraccount.handle}`,
                   twitterid: `${this.twitteraccount.twitterid}`
                 }).then(res => {

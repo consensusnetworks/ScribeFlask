@@ -26,7 +26,7 @@ To run faust agent that will asynchronously gather an accounts most recent tweet
 ```
 cd faust
 docker build .
-docker run -p 6066:6066 -p 9092:9092 --network=host <Container ID>
+docker run -p 6066:6066 -p 9092:9092 --network=host <Container_ID>
 ```
 **Note**: Make sure you change the container id to the one created at the end of the build.
 
